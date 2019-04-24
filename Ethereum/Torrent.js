@@ -3,7 +3,7 @@ import BTorrent from './build/BTorrent.json';
 
 const instance = new web3.eth.Contract(
     JSON.parse(BTorrent.interface),
-    '0x12e0C135a97fE4222Bc5305eD6f742C18dD528c7'
+    '0x9Fc1E03C5012F4b6203C52f0750B0efC8A3cBF75'
 );
 
 export default instance;
