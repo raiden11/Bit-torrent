@@ -19,6 +19,7 @@
     "next": "^4.1.4",
     "next-routes": "^1.4.2",
     "react": "^16.7.0",
+    "react-circular-progressbar": "^1.1.0",
     "react-dom": "^16.7.0",
     "semantic-ui-react": "^0.84.0",
     "shelljs": "^0.8.3",
