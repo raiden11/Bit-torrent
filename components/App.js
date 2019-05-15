@@ -6,10 +6,12 @@ import web3 from '../Ethereum/web3';
 import UserBase from '../Ethereum/Users';
 import Btorrent from '../Ethereum/Torrent';
 
-
+let accounts;
+const TorrentInfo = require('./torrentInfoArray');
 const axios = require('axios');
 
 import ProgressBar from './progressBar';
+import { type } from 'os';
 
 
 class App extends Component {
@@ -19,8 +21,18 @@ class App extends Component {
     displayResults:'',
     description: [],
     downloadCost:0,
-    progress:false
+    progress:false,
+    fileName:'',
+    fileLink:'',
+    fileSize:0,
+    rating:0,
+    userId:''
 };
+
+
+async componentDidMount(){
+  accounts = await web3.eth.getAccounts();
+}
 
 
 triggerSearch = async (event) => {
@@ -29,7 +41,7 @@ triggerSearch = async (event) => {
 
     const value = event.target.value;
     const queryCount = 4;
-    const maxSize = 5;
+    const maxSize = 15;
     const minLength = 3;
     this.setState({value: value});
 
@@ -44,7 +56,7 @@ triggerSearch = async (event) => {
                             "completion" : { 
                                 "field" : "suggest" ,
                                 "size": maxSize, 
-                                "skip_duplicates": false,
+                                "skip_duplicates": true,
                                 "fuzzy":{
                                   "fuzziness":index,
                                   "min_length": minLength
@@ -57,6 +69,9 @@ triggerSearch = async (event) => {
             .catch(err => console.log(err));
       })
   );
+
+
+  console.log(data);
 
   
   let duplicates = new Set();
@@ -90,7 +105,7 @@ triggerSearch = async (event) => {
 
 
 
-  first = first.slice(0,Math.min(10, first.length));
+  first = first.slice(0,Math.min(15, first.length));
   const displayResults = first.map((element) => 
     <List.Item key = {element}>
       <List.Icon name='favorite' size='large' verticalAlign='middle' />
@@ -109,11 +124,11 @@ triggerSearch = async (event) => {
   startDownload = async(event) => {
     event.preventDefault();
 
-    const accounts = await web3.eth.getAccounts();
-
     this.call();
 
-    await UserBase.methods.startDownload(this.state.downloadCost).send({
+    await UserBase.methods.startDownload(this.state.downloadCost, this.state.fileLink,
+      this.state.fileName, this.state.fileSize, this.state.rating,
+      '0x0FcF01fCF8AF6f97BE17a4e1Db701D2cfFD78645', this.state.userId).send({
       from: accounts[0],
       value: this.state.downloadCost
     });
@@ -125,11 +140,8 @@ triggerSearch = async (event) => {
 
     const url = "http://localhost:5000/download";
 
-    // add progess bar
-
     this.setState({progress:true});
-    console.log(this.state.progress);
-    
+
     axios.get(url).then(data => {
       console.log(data.data);
       setInterval(this.callUpload, 5000);
@@ -148,16 +160,21 @@ triggerSearch = async (event) => {
 
   onClick = async(event) => {
     event.preventDefault();
-    const searchTerm = "www.google.com";
+    const searchTerm = event.target.textContent;
 
-    const response = await Btorrent.methods.getTorrentInfo(searchTerm).call();
-    console.log(response);
+    const Randomindex = Math.floor(Math.random() * (5 - 0)) + 0;
     const results = [];
-    results.push(response);
+    results.push(TorrentInfo[Randomindex]);
+
+    const pStyle = {
+      fontSize: '15px',
+      color:'blue',
+      fontStyle:'italic'
+    };
 
     const items = results.map((element,index) => 
 
-            <Card>
+            <Card key="1">
                 <Card.Content>
 
                 <Card.Meta>Torrent Download Information</Card.Meta>
@@ -168,35 +185,37 @@ triggerSearch = async (event) => {
                     <List.Item>
                         <List.Icon name='caret right' size='small' verticalAlign='middle' />
                         <List.Content>
-                            <List.Header> FileName: {element[1]}</List.Header>
+                            <List.Header> FileName:  <span style={pStyle}>{searchTerm}</span></List.Header>
+                        </List.Content>
+                    </List.Item>
+
+                    
+
+                    <List.Item>
+                        <List.Icon name='caret right' size='small' verticalAlign='middle' />
+                        <List.Content>
+                            <List.Header>Link of File: <span style={pStyle}>{element['link']}</span></List.Header>
                         </List.Content>
                     </List.Item>
 
                     <List.Item>
                         <List.Icon name='caret right' size='small' verticalAlign='middle' />
                         <List.Content>
-                            <List.Header>Link of File: {element[0]}</List.Header>
+                            <List.Header>Size of File: <span style={pStyle}>{element['size']} Kb</span></List.Header>
                         </List.Content>
                     </List.Item>
 
                     <List.Item>
                         <List.Icon name='caret right' size='small' verticalAlign='middle' />
                         <List.Content>
-                            <List.Header>Size of File: {element[2]} kB</List.Header>
+                            <List.Header>User Ratings: <span style={pStyle}>{element['rating']} (0-5)</span></List.Header>
                         </List.Content>
                     </List.Item>
 
                     <List.Item>
                         <List.Icon name='caret right' size='small' verticalAlign='middle' />
                         <List.Content>
-                            <List.Header>User Ratings: {element[4]} (0-5)</List.Header>
-                        </List.Content>
-                    </List.Item>
-
-                    <List.Item>
-                        <List.Icon name='caret right' size='small' verticalAlign='middle' />
-                        <List.Content>
-                            <List.Header>Cost of Downloading: {element[3]*1000 } wei</List.Header>
+                            <List.Header>Cost of Downloading: <span style={pStyle}>{Math.floor((element['size']*5)/3) } wei</span></List.Header>
                         </List.Content>
                     </List.Item>
 
@@ -217,7 +236,10 @@ triggerSearch = async (event) => {
 
     );
 
-    this.setState({downloadCost:results[0][3]});
+    this.setState({downloadCost:Math.floor((TorrentInfo[Randomindex]['size']*5)/3)});
+    this.setState({fileName: searchTerm, fileLink:TorrentInfo[Randomindex]['link'],
+       fileSize:TorrentInfo[Randomindex]['size'], rating:TorrentInfo[Randomindex]['rating'], userId:accounts[0]});
+
     this.setState({displayResults: [], description: items});
   }
 

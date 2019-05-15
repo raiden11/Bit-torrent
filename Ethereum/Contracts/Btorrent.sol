@@ -49,7 +49,7 @@ contract UserBase{
         string fileName;
         uint16 userRating;
         uint16 fileSize;          // In Kbs as of now
-        uint16 costToDownload;    // in milliEther
+        uint16 costToDownload;    
         address creator;
     }
     
@@ -75,20 +75,22 @@ contract UserBase{
     }
     
 
-    function startDownload(uint16 costToDownload) public payable {
+    function startDownload(uint16 costToDownload, string fileLink, string fileName, 
+    uint16 fileSize,uint16 rating, address creator, address UserId) public payable {
 
         require(msg.value >= costToDownload);
+        addToDownloads(fileLink, fileName, fileSize, costToDownload, rating, creator, UserId);
         return;
     }
     
-    function addToDownloads(string fileLink, string fileName, uint16 fileSize,address creator, address UserId) public{
+    function addToDownloads(string fileLink, string fileName, uint16 fileSize,uint16 cost, uint16 rating,address creator, address UserId) public{
         
         Torrent memory torrent = Torrent({
             fileLink: fileLink,
             fileName: fileName,
-            userRating: 0,
+            userRating: rating,
             fileSize: fileSize,
-            costToDownload: fileSize/1000,
+            costToDownload: cost,
             creator: creator
         });
         

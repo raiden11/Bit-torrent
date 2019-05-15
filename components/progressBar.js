@@ -12,7 +12,7 @@ class progressBar extends React.Component {
     }
 
     componentDidMount() {
-        this.interval = setInterval(() => this.tick(), 1500);
+        this.interval = setInterval(() => this.tick(), 2000);
     }
 
     clea
