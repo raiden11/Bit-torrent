@@ -18,8 +18,6 @@ class Users extends Component {
 
         this.setState({username:'Loading'});
 
-        console.log(isUser);
-
         if(!isUser){
             await UserBase.methods.createUser().send({
                 from:accounts[0]
@@ -28,17 +26,19 @@ class Users extends Component {
 
         const downloadSize = await UserBase.methods.getDownloadSize(accounts[0]).call();
 
-        console.log(downloadSize);
-
         const results = await Promise.all(
             Array(parseInt(downloadSize)).fill().map((element, index) => {
                 return UserBase.methods.getUserDownloadInfo(index, accounts[0]).call();
             })
         );
 
-        console.log(results);
-
         this.setState({username:''});
+
+        const pStyle = {
+            fontSize: '15px',
+            color:'blue',
+            fontStyle:'italic'
+          };
 
 
         const items = results.map((element,index) => 
@@ -54,35 +54,35 @@ class Users extends Component {
                     <List.Item>
                         <List.Icon name='caret right' size='small' verticalAlign='middle' />
                         <List.Content>
-                            <List.Header> FileName: {element[1]}</List.Header>
+                            <List.Header> FileName: <span style={pStyle}>{element[1]}</span></List.Header>
                         </List.Content>
                     </List.Item>
 
                     <List.Item>
                         <List.Icon name='caret right' size='small' verticalAlign='middle' />
                         <List.Content>
-                            <List.Header>Link of File: {element[0]}</List.Header>
+                            <List.Header>Link of File: <span style={pStyle}>{element[0]}</span></List.Header>
                         </List.Content>
                     </List.Item>
 
                     <List.Item>
                         <List.Icon name='caret right' size='small' verticalAlign='middle' />
                         <List.Content>
-                            <List.Header>Size of File: {element[2]} kB</List.Header>
+                            <List.Header>Size of File: <span style={pStyle}>{element[2]} KB</span></List.Header>
                         </List.Content>
                     </List.Item>
 
                     <List.Item>
                         <List.Icon name='caret right' size='small' verticalAlign='middle' />
                         <List.Content>
-                            <List.Header>User Ratings: {element[4]} (0-5)</List.Header>
+                            <List.Header>User Ratings: <span style={pStyle}>{element[4]} (0-5)</span></List.Header>
                         </List.Content>
                     </List.Item>
 
                     <List.Item>
                         <List.Icon name='caret right' size='small' verticalAlign='middle' />
                         <List.Content>
-                            <List.Header>Cost of Downloading: {element[3]*1000 } wei</List.Header>
+                            <List.Header>Cost of Downloading: <span style={pStyle}>{element[3]} Wei</span></List.Header>
                         </List.Content>
                     </List.Item>
 

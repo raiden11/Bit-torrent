@@ -3,7 +3,7 @@ import UserBase from './build/UserBase.json';
 
 const instance =new web3.eth.Contract(
     JSON.parse(UserBase.interface),
-    '0xBedc889148494AF7513970065C18b2346149e834'
+    '0x26a88D92A968907b339bE4CD972F1b13a1ab5A0B'
 );
 
 export default instance;
