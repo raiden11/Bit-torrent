@@ -124,7 +124,6 @@ triggerSearch = async (event) => {
   startDownload = async(event) => {
     event.preventDefault();
 
-    this.call();
 
     await UserBase.methods.startDownload(this.state.downloadCost, this.state.fileLink,
       this.state.fileName, this.state.fileSize, this.state.rating,
@@ -133,7 +132,7 @@ triggerSearch = async (event) => {
       value: this.state.downloadCost
     });
 
-    
+    this.call();
   }
 
   call = async(event) => {

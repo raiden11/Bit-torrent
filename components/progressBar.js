@@ -12,7 +12,7 @@ class progressBar extends React.Component {
     }
 
     componentDidMount() {
-        this.interval = setInterval(() => this.tick(), 2000);
+        this.interval = setInterval(() => this.tick(), 4000);
     }
 
     clea
@@ -27,9 +27,9 @@ class progressBar extends React.Component {
 
       
         this.setState(prevState => ({
-          progress: prevState.progress + 5
+          progress: prevState.progress + 2
         }));
-        if(this.state.progress == 105){
+        if(this.state.progress > 100){
             this.componentDidUnMount();
         }
     }
