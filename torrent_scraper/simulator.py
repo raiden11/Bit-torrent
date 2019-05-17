@@ -16,15 +16,15 @@ e = 2.718281828
 ln2 = 0.69314718
 money_in_contract = 0
 
+
 def torrentAggregator():
 
 	global popularity_score_1, popularity_score_2, popularity_score_3, total_seeders, total_leechers
 
 	torrent_sizes = []
 	for file in TorrentFiles:
-		with open(file, "r") as csvfile:
+		with open(file, "r",encoding="utf8") as csvfile:
 
-			counter = 0
 			readCSV = csv.reader(csvfile, delimiter = ',')
 			for row in readCSV:
 
@@ -33,16 +33,10 @@ def torrentAggregator():
 				torrent['seeders'] = int(row[2][1:])
 				torrent['leechers'] = int(row[3][1:])
 				
-				torrent['popularity_score_1'] = 0.7 * torrent['seeders'] + 0.3 * torrent['leechers']
-				torrent['popularity_score_2'] = 0.3 * torrent['seeders'] + 0.7 * torrent['leechers']
+				torrent['popularity_score_1'] = 0.5 * torrent['seeders'] + 0.5 * torrent['leechers']
+				torrent['popularity_score_2'] = 0.5 * torrent['seeders'] + 0.5 * torrent['leechers']
 				torrent['popularity_score_3'] = 0.5 * torrent['seeders'] + 0.5 * torrent['leechers']
 				
-				popularity_score_1.append(torrent['popularity_score_1'])
-				popularity_score_2.append(torrent['popularity_score_2'])
-				popularity_score_3.append(torrent['popularity_score_3']) 
-				
-				total_seeders += torrent['seeders']
-				total_leechers += torrent['leechers']
 
 				words = row[1].split(' ')
 				
@@ -59,21 +53,31 @@ def torrentAggregator():
 					size *= 0.001
 				
 				torrent['file_size'] = size
+
 				TorrentsList.append(torrent)
 				torrent_sizes.append(torrent['file_size'])
+				popularity_score_1.append(torrent['popularity_score_1'])
+				popularity_score_2.append(torrent['popularity_score_2'])
+				popularity_score_3.append(torrent['popularity_score_3']) 
+				
+				total_seeders += torrent['seeders']
+				total_leechers += torrent['leechers']
+
+
+				
+
+				
 	
 	popularity_score_1 = popularity_score_1/np.sum(popularity_score_1)
 	popularity_score_2 = popularity_score_2/np.sum(popularity_score_2)
 	popularity_score_3 = popularity_score_3/np.sum(popularity_score_3)
 	
-	print(np.std(torrent_sizes))
-	print(np.mean(torrent_sizes))
-	print(popularity_score_1)
+	print("Std" , np.std(torrent_sizes))
+	print("Mean",np.mean(torrent_sizes))
 	
 
 
 def distributeAmongUsers():
-
 
 	for user in range(0, UserCount):
 
@@ -89,9 +93,9 @@ def distributeAmongUsers():
 
 		UserBase.append(userDict)
 		
-	# f = open("hello1.pickle", "wb")
-	# pickle.dump(UserBase, f)
-	# f.close()
+	f = open("userbase.pickle", "wb")
+	pickle.dump(UserBase, f)
+	f.close()
 
 
 def calculate_price(N_knot, lambdaa, pop_score, file_size, factor = 1.0):
@@ -103,8 +107,6 @@ def calculate_price(N_knot, lambdaa, pop_score, file_size, factor = 1.0):
 # K is the popularity score at which payout becomes n0/2
 # P is the payout per MB when popularity score is 100
 def calculate_function_parameters(K, P):
-	
-	global e, ln2 
 
 	lambdaa = ln2/K
 	exponent = pow(e, -lambdaa)
@@ -116,42 +118,40 @@ def calculate_function_parameters(K, P):
 def preprocess(N_knot, lambdaa):
 
 	global money_in_contract
+	global UserBase
 
-	f1 = open("hello1.pickle", "rb")
-	UserBase = pickle.load(f1)
-	f1.close()
+	f = open("userbase.pickle", "rb")
+	UserBase = pickle.load(f)
+	f.close()
 
 	downloaded_file_to_users = [[] for i in range(len(TorrentsList))]
 	required_file_to_users = [[] for i in range(len(TorrentsList))]
 
-	# i iterates over all users
+
 	for i in range(0, UserCount):
 		
 		for file_index in UserBase[i]['downloads']:
 			downloaded_file_to_users[file_index].append(i)
-			# price = calculate_price(N_knot, lambdaa, popularity_score_3[file_index], 
-			# 	TorrentsList[file_index]['file_size'], 1.0/0.99)
-			
-			# UserBase[i]['amount'] -= price
-			# money_in_contract += price
+			# not deducting money here
 
 		for file_index in UserBase[i]['required']:
 			required_file_to_users[file_index].append(i)
+	
 
-	# for i in range(len(TorrentsList)):
-	# 	print(len(downloaded_file_to_users[i]), popularity_score_1[i])	
-
-	return downloaded_file_to_users, required_file_to_users, UserBase
+	return downloaded_file_to_users, required_file_to_users
 
 
-def distributeCurrency(N_knot, lambdaa, UserBase, downloaded_file_to_users, required_file_to_users):
+def distributeCurrency(N_knot, lambdaa, downloaded_file_to_users, required_file_to_users):
 
 	global money_in_contract
-	# f1 = open("hello1.pickle", "rb")
-	# UserBase = pickle.load(f1)
-	# f1.close()
+	count=0
+	add_sum=0
 
+	required_sum=0
+	
 	for file_index in range(len(TorrentsList)):
+
+		required_sum += len(required_file_to_users[file_index])
 		
 		if len(downloaded_file_to_users[file_index]) > 0:
 			seeders = np.random.choice(downloaded_file_to_users[file_index], len(required_file_to_users[file_index]))
@@ -160,6 +160,7 @@ def distributeCurrency(N_knot, lambdaa, UserBase, downloaded_file_to_users, requ
 				price = calculate_price(N_knot, lambdaa, popularity_score_3[file_index], 
 					TorrentsList[file_index]['file_size'])
 
+				
 				UserBase[user_index]['amount'] += price
 				money_in_contract -= price
 
@@ -171,34 +172,51 @@ def distributeCurrency(N_knot, lambdaa, UserBase, downloaded_file_to_users, requ
 				UserBase[user_index]['amount'] -= price
 				money_in_contract += price
 
-	return UserBase
+		elif len(required_file_to_users[file_index])>0:
+			# print(len(required_file_to_users[file_index]))
+			add_sum += len(required_file_to_users[file_index])
+			count +=1
+
+	print(count, add_sum,required_sum)
 
 
 def main():
 
-	global money_in_contract
 	torrentAggregator()
-	# random.shuffle(TorrentsList)
-	# print(len(TorrentsList))
+	random.shuffle(TorrentsList)
+
+	print("Size ", len(TorrentsList))
+
 	distributeAmongUsers()
-	N_knot, lambdaa = calculate_function_parameters(1000, 1)
-	downloaded_file_to_users, required_file_to_users, UserBase = preprocess(N_knot, lambdaa)
-	UserBase = distributeCurrency(N_knot, lambdaa, UserBase, downloaded_file_to_users, required_file_to_users)
+
+	N_knot, lambdaa = calculate_function_parameters(2000, 1)
+	print(N_knot, lambdaa)
+	downloaded_file_to_users, required_file_to_users = preprocess(N_knot, lambdaa)
+
+	distributeCurrency(N_knot, lambdaa, downloaded_file_to_users, required_file_to_users)
 
 	total = 0
 	count = 0
 	for user in range(len(UserBase)):
-		print(UserBase[user]['amount'])
 		total += UserBase[user]['amount']
 		if UserBase[user]['amount'] < 0:
 			count += 1
 
+	variance_arr = []
+
+	for user in UserBase:
+		variance_arr.append(user['amount'])
+
+	variance_arr.sort()
+	size = len(variance_arr)
+	size//=2
+	print(variance_arr[size])
+		
+	print("Mean ",np.mean(variance_arr))
+	print("std dev",np.std(variance_arr))
 	print("Money in contract: ", money_in_contract)
 	print("total: ", total)
 	print("negative: ", count)
-
-	# for user in UserBase:
-	# 	print(user)
 
 
 main()
