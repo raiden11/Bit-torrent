@@ -5,10 +5,10 @@ import Layout from './layout';
 import web3 from '../Ethereum/web3';
 import UserBase from '../Ethereum/Users';
 import Btorrent from '../Ethereum/Torrent';
-
 let accounts;
 const TorrentInfo = require('./torrentInfoArray');
 const axios = require('axios');
+const Download = require('./client_download');
 
 import ProgressBar from './progressBar';
 import { type } from 'os';
@@ -124,6 +124,7 @@ triggerSearch = async (event) => {
   startDownload = async(event) => {
     event.preventDefault();
 
+    this.setState({progress:true});
 
     await UserBase.methods.startDownload(this.state.downloadCost, this.state.fileLink,
       this.state.fileName, this.state.fileSize, this.state.rating,
@@ -133,19 +134,25 @@ triggerSearch = async (event) => {
     });
 
     this.call();
+
+    
   }
 
   call = async(event) => {
 
+    let body = {
+      fileName:this.state.fileName,
+      fileSize:this.state.fileSize
+    }
+
     const url = "http://localhost:5000/download";
 
-    this.setState({progress:true});
 
-    axios.get(url).then(data => {
-      console.log(data.data);
+    axios.post(url, body).then(data => {
+
+      Download.download(data.data,this.state.fileName);
       setInterval(this.callUpload, 5000);
     });
-
 
   }
 
@@ -153,8 +160,6 @@ triggerSearch = async (event) => {
 
     const url = "http://localhost:5000/upload";
     const data = await axios.get(url);
-    console.log(data.data);
-
   }
 
   onClick = async(event) => {

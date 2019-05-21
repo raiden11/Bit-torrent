@@ -12,10 +12,9 @@ class progressBar extends React.Component {
     }
 
     componentDidMount() {
-        this.interval = setInterval(() => this.tick(), 4000);
+        this.interval = setInterval(() => this.tick(), 1000);
     }
 
-    clea
 
     componentDidUnMount() {
         clearInterval(this.interval);
@@ -29,7 +28,7 @@ class progressBar extends React.Component {
         this.setState(prevState => ({
           progress: prevState.progress + 2
         }));
-        if(this.state.progress > 100){
+        if(this.state.progress >= 100){
             this.componentDidUnMount();
         }
     }
@@ -40,7 +39,7 @@ class progressBar extends React.Component {
 
         <div style={{ width: '100px' }}>
 
-        {this.state.progress!=105 &&
+        {this.state.progress!=100 &&
             
             <CircularProgressbar percentage={this.state.progress} text={`${this.state.progress}%`}
             styles={{
