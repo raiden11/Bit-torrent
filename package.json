@@ -15,6 +15,7 @@
     "axios": "^0.18.0",
     "child_process": "^1.0.2",
     "elasticsearch": "^15.4.1",
+    "fs": "0.0.1-security",
     "fs-extra": "^7.0.1",
     "next": "^4.1.4",
     "next-routes": "^1.4.2",
