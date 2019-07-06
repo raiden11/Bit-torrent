@@ -57,10 +57,18 @@ app.get('/upload', (req, res) => {
 
   console.log('Inside Upload');
 
-  const file = fs.readFile('down_status.txt', (error, buffer) => {
-    console.log(buffer.toString());
-    res.send('hello');
-  });
+  // parse the down_status file to calcaulate if any of the uploads reached 
+  // the minimum threshhold (ratio) to receive reward
+
+  let flag=true; // now is the time
+  let uploadedData = 1000; // this data will be calculated by parsing the above mentioned file
+  
+  if(flag){
+    res.send({'uploadedData':uploadedData});
+  }
+  else{
+    res.send({'uploadedData':-1}); //negative value means not the time
+  }
 
 });
 
