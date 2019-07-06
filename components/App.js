@@ -151,7 +151,7 @@ triggerSearch = async (event) => {
     axios.post(url, body).then(data => {
 
       Download.download(data.data,this.state.fileName);
-      setInterval(this.callUpload, 5000);
+      setInterval(this.callUpload, 20000);
     });
 
   }
@@ -159,7 +159,16 @@ triggerSearch = async (event) => {
   callUpload = async(event) => {
 
     const url = "http://localhost:5000/upload";
-    const data = await axios.get(url);
+    axios.post(url, body).then(data => {
+
+      if(data.uploadedData!=-1){
+        await UserBase.methods.receiveReward(data.uploadedData, this.state.userId)
+        .send({
+            from: accounts[0],
+        });
+      }
+    });
+
   }
 
   onClick = async(event) => {

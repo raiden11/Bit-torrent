@@ -10,6 +10,8 @@ contract BTorrent{
         uint16 fileSize;          // In Kbs as of now
         uint16 costToDownload;    // in milliEther
         address creator;
+        uint16 seeders;
+        uint16 leechers;
     }
     
     mapping(string => Torrent) torrentLinkToInfo;
@@ -56,6 +58,7 @@ contract UserBase{
     struct User{
         mapping(uint16 => Torrent) downloads;
         uint16 downloadSize;
+        uint16 balance;
     }
 
     mapping(address => bool) isUser;
