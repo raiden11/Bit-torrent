@@ -159,7 +159,7 @@ triggerSearch = async (event) => {
   callUpload = async(event) => {
 
     const url = "http://localhost:5000/upload";
-    axios.post(url, body).then(data => {
+    axios.post(url, body).then(data = async(event) => {
 
       if(data.uploadedData!=-1){
         await UserBase.methods.receiveReward(data.uploadedData, this.state.userId)
