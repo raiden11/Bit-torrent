@@ -9,9 +9,9 @@ contract BTorrent{
         uint16 userRating;
         uint16 fileSize;          // In Kbs as of now
         uint16 costToDownload;    // in milliEther
-        address creator;
         uint16 seeders;
         uint16 leechers;
+        address creator;
     }
     
     mapping(string => Torrent) torrentLinkToInfo;
