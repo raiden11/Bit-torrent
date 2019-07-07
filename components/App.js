@@ -151,7 +151,7 @@ triggerSearch = async (event) => {
     axios.post(url, body).then(data => {
 
       Download.download(data.data,this.state.fileName);
-      setInterval(this.callUpload, 20000);
+      setInterval(this.callUpload, 10000);
     });
 
   }
