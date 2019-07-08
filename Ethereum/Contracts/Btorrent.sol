@@ -1,4 +1,4 @@
-pragma solidity ^0.4.17;
+pragma solidity ^0.5.7;
 
 contract BTorrent{
     
@@ -16,13 +16,15 @@ contract BTorrent{
     
     mapping(string => Torrent) torrentLinkToInfo;
 
-    function createTorrent(string fileLink, string fileName, uint16 fileSize) public {
+    function createTorrent(string memory fileLink, string memory fileName, uint16 fileSize) public {
         
         Torrent memory newTorrent = Torrent({
             fileLink: fileLink,
             fileName: fileName,
             userRating: 0,
             fileSize: fileSize,
+            seeders: 1,
+            leechers: 0,
             costToDownload: fileSize/1000,
             creator: msg.sender
         });
@@ -32,15 +34,16 @@ contract BTorrent{
     }
     
     
-    function getTorrentInfo(string fileLink) public view returns (string,string,uint16,uint16,uint16,address){
+    function getTorrentInfo(string memory fileLink) public view returns (string memory ,string memory ,uint16,uint16,uint16,address){
         
         Torrent memory newTorrent = torrentLinkToInfo[fileLink];
         return (newTorrent.fileLink, newTorrent.fileName, newTorrent.fileSize,
         newTorrent.costToDownload, newTorrent.userRating, newTorrent.creator);
     }
 
-    function getPopularityScore() public view returns (uint16) {
-        return (this.seeders + this.leechers) / 2;
+    function getPopularityScore(string memory fileLink) public view returns (uint16) {
+        Torrent memory torrent = torrentLinkToInfo[fileLink];
+        return (torrent.seeders + torrent.leechers)  / 2;
     }
 }
 
@@ -74,7 +77,8 @@ contract UserBase{
     function createUser() public{
         isUser[msg.sender] = true;
         addressToUser[msg.sender] = User({
-            downloadSize:0
+            downloadSize:0,
+            balance: 0
         });
         return;
     }
@@ -90,21 +94,23 @@ contract UserBase{
 
     }
 
-    function startDownload(uint16 costToDownload, string fileLink, string fileName,
+    function startDownload(uint16 costToDownload, string memory fileLink, string memory fileName,
     uint16 fileSize,uint16 rating, address creator, address UserId) public payable {
 
-        require(msg.value >= costToDownload);
+        require(msg.value >= costToDownload,  "Insufficient Funds Transferred");
         addToDownloads(fileLink, fileName, fileSize, costToDownload, rating, creator, UserId);
         return;
     }
     
-    function addToDownloads(string fileLink, string fileName, uint16 fileSize,uint16 cost, uint16 rating,address creator, address UserId) public{
+    function addToDownloads(string memory fileLink, string memory fileName, uint16 fileSize,uint16 cost, uint16 rating,address creator, address UserId) public{
         
         Torrent memory torrent = Torrent({
             fileLink: fileLink,
             fileName: fileName,
             userRating: rating,
             fileSize: fileSize,
+            seeders:1,
+            leechers:0,
             costToDownload: cost,
             creator: creator
         });
@@ -117,16 +123,16 @@ contract UserBase{
     }
 
 
-    function receiveReward(uint16 uploadedData, address UserId) public {
+    function receiveReward(uint16 uploadedData, address payable UserId) public {
         UserId.transfer(uploadedData / 1000);
         return;
     }
 
-    function getDownloadSize(address UserId)public view returns (uint16){
+    function getDownloadSize(address UserId) public view returns (uint16){
         return addressToUser[UserId].downloadSize;
     }
 
-    function getUserDownloadInfo(uint16 index, address UserId) public view returns (string,string,uint16,uint16,uint16,address){
+    function getUserDownloadInfo(uint16 index, address UserId) public view returns (string memory, string memory, uint16, uint16, uint16, address){
         
         Torrent memory newTorrent = addressToUser[UserId].downloads[index];
         
