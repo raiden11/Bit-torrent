@@ -8,7 +8,7 @@ contract BTorrent{
         string fileName;
         uint16 userRating;
         uint16 fileSize;          // In Kbs as of now
-        uint16 costToDownload;    // in milliEther
+        uint16 costToDownload;    // to be deprecated
         uint16 seeders;
         uint16 leechers;
         address creator;
@@ -32,29 +32,32 @@ contract BTorrent{
     }
     
     
-    function getTorrentInfo(string fileLink) public view  returns (string,string,uint16,uint16,uint16,address){
+    function getTorrentInfo(string fileLink) public view returns (string,string,uint16,uint16,uint16,address){
         
         Torrent memory newTorrent = torrentLinkToInfo[fileLink];
         return (newTorrent.fileLink, newTorrent.fileName, newTorrent.fileSize,
         newTorrent.costToDownload, newTorrent.userRating, newTorrent.creator);
     }
-    
-    
+
+    function getPopularityScore() public view returns (uint16) {
+        return (this.seeders + this.leechers) / 2;
+    }
 }
 
 
 contract UserBase{
-    
     struct Torrent{
 
         string fileLink;
         string fileName;
         uint16 userRating;
         uint16 fileSize;          // In Kbs as of now
-        uint16 costToDownload;    
+        uint16 costToDownload;
+        uint16 seeders;
+        uint16 leechers;
         address creator;
     }
-    
+
     struct User{
         mapping(uint16 => Torrent) downloads;
         uint16 downloadSize;
@@ -64,21 +67,30 @@ contract UserBase{
     mapping(address => bool) isUser;
     mapping(address => User) addressToUser;
 
-    
-    function userExists(address UserID)public view returns (bool){
+    function userExists(address UserID) public view returns (bool){
         return isUser[UserID];
     }
     
     function createUser() public{
-        isUser[msg.sender]= true;
+        isUser[msg.sender] = true;
         addressToUser[msg.sender] = User({
             downloadSize:0
         });
         return;
     }
     
+    function getCostToDownload() public view returns (uint16) {
+        // For implementation refer: https://github.com/abdk-consulting/abdk-libraries-solidity
+        // return N0 * e ^ (- lambda * x)
 
-    function startDownload(uint16 costToDownload, string fileLink, string fileName, 
+    }
+
+    function getPayout() public view returns (uint16) {
+        // return R * costToDownload()
+
+    }
+
+    function startDownload(uint16 costToDownload, string fileLink, string fileName,
     uint16 fileSize,uint16 rating, address creator, address UserId) public payable {
 
         require(msg.value >= costToDownload);
@@ -98,7 +110,7 @@ contract UserBase{
         });
         
         User storage currUser = addressToUser[UserId];
-        currUser.downloads[currUser.downloadSize]=torrent;
+        currUser.downloads[currUser.downloadSize] = torrent;
         currUser.downloadSize = currUser.downloadSize+1;
 
         return;
@@ -106,7 +118,7 @@ contract UserBase{
 
 
     function receiveReward(uint16 uploadedData, address UserId) public {
-        UserId.transfer(uploadedData /1000);
+        UserId.transfer(uploadedData / 1000);
         return;
     }
 
@@ -114,13 +126,11 @@ contract UserBase{
         return addressToUser[UserId].downloadSize;
     }
 
-    function getUserDownloadInfo(uint16 index, address UserId)public view returns (string,string,uint16,uint16,uint16,address){
+    function getUserDownloadInfo(uint16 index, address UserId) public view returns (string,string,uint16,uint16,uint16,address){
         
         Torrent memory newTorrent = addressToUser[UserId].downloads[index];
         
         return (newTorrent.fileLink, newTorrent.fileName, newTorrent.fileSize,
         newTorrent.costToDownload, newTorrent.userRating, newTorrent.creator);
-    }
-
-    
+    }   
 }
