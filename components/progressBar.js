@@ -26,7 +26,7 @@ class progressBar extends React.Component {
 
       
         this.setState(prevState => ({
-          progress: prevState.progress + 2
+          progress: prevState.progress + 4
         }));
         if(this.state.progress >= 100){
             this.componentDidUnMount();
