@@ -127,7 +127,9 @@ contract UserBase{
 
 
     function receiveReward(uint256 rewardAmount, address UserId) public payable{
+
         UserId.transfer(rewardAmount);
+        addressToUser[UserId].balance = addressToUser[UserId].balance + rewardAmount;
         return;
     }
 
