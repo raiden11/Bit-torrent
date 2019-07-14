@@ -197,24 +197,6 @@ class App extends Component {
     console.log("balance", balance);
 
     this.setState({ balance: balance });
-
-    // const url = "http://localhost:5000/upload";
-    // axios.post(url, body).then(data = async(event) => {
-
-    //   if(data.uploadedData!=-1){
-    //     await UserBase.methods.receiveReward(data.uploadedData, this.state.userId)
-    //     .send({
-    //         from: accounts[0],
-    //     });
-
-    //     const balance =  await UserBase.methods.getBalance(accounts[0]).send({
-    //       from:accounts[0]
-    //     });
-
-    //     this.setState({balance: balance});
-
-    //   }
-    // });
   };
 
   onClick = async event => {

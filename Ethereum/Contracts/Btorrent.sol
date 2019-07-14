@@ -82,17 +82,6 @@ contract UserBase{
         });
         return;
     }
-    
-    function getCostToDownload() public view returns (uint256) {
-        // For implementation refer: https://github.com/abdk-consulting/abdk-libraries-solidity
-        // return N0 * e ^ (- lambda * x)
-
-    }
-
-    function getPayout() public view returns (uint256) {
-        // return R * costToDownload()
-
-    }
 
     function getBalance(address userId)public view returns (uint256){
         return addressToUser[userId].balance;

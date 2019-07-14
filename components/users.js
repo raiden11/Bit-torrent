@@ -102,11 +102,6 @@ class Users extends Component {
        this.setState({username: accounts[0]});
     }
 
-
-   
-
-
-    
     render() {
 
         return(
