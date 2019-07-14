@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Form,Input, FormField, Container, List, Card, Grid, GridRow, GridColumn, Button} from 'semantic-ui-react';
+import {Form,Input, FormField, Container, List, Card, Grid, GridRow, GridColumn, Button, Breadcrumb} from 'semantic-ui-react';
 import ES from './ElasticClient' ;
 import Layout from './layout';
 import web3 from '../Ethereum/web3';
@@ -26,14 +26,14 @@ class App extends Component {
     fileLink:'',
     fileSize:0,
     rating:0,
-    userId:''
+    userId:'',
+    balance:0
 };
 
 
 async componentDidMount(){
   accounts = await web3.eth.getAccounts();
 }
-
 
 triggerSearch = async (event) => {
     event.preventDefault();
@@ -126,11 +126,16 @@ triggerSearch = async (event) => {
 
     this.setState({progress:true});
 
+    // web3.fromWei(web3.eth.getBalance(contractAddress),).toString()
+
     await UserBase.methods.startDownload(this.state.downloadCost, this.state.fileLink,
       this.state.fileName, this.state.fileSize, this.state.rating,
       '0x0FcF01fCF8AF6f97BE17a4e1Db701D2cfFD78645', this.state.userId).send({
       from: accounts[0],
-      value: this.state.downloadCost
+      value: this.state.downloadCost,
+      // value:web3.toWei(,’ether’)})
+
+
     });
 
     this.call();
@@ -151,23 +156,57 @@ triggerSearch = async (event) => {
     axios.post(url, body).then(data => {
 
       Download.download(data.data,this.state.fileName);
-      setInterval(this.callUpload, 10000);
+      this.callUpload();
+      setInterval(this.callUpload, 40000);
     });
 
   }
 
   callUpload = async(event) => {
 
-    const url = "http://localhost:5000/upload";
-    axios.post(url, body).then(data = async(event) => {
+    let contractAddress = '0x5E74838F9703F5dC521678Bf5b06c9E445a53a99';
 
-      if(data.uploadedData!=-1){
-        await UserBase.methods.receiveReward(data.uploadedData, this.state.userId)
+// console.log(web3.fromWei(web3.eth.getBalance(contractAddress),'ether')
+// .toString())
+
+    let value = Math.floor((Math.random() * 5) + 1);
+    let rewardAmount = 9*value/(100000 * 16819)*(Math.pow(10, 18));
+    
+    console.log('first', rewardAmount)
+
+    await UserBase.methods.receiveReward(Math.floor(rewardAmount), this.state.userId)
         .send({
             from: accounts[0],
         });
-      }
-    });
+
+    console.log('second', rewardAmount)
+    
+
+    const balance =  await UserBase.methods.getBalance(accounts[0]).call();
+
+    console.log('balance', balance);
+
+    this.setState({balance: balance});
+
+
+    // const url = "http://localhost:5000/upload";
+    // axios.post(url, body).then(data = async(event) => {
+
+      
+    //   if(data.uploadedData!=-1){
+    //     await UserBase.methods.receiveReward(data.uploadedData, this.state.userId)
+    //     .send({
+    //         from: accounts[0],
+    //     });
+
+    //     const balance =  await UserBase.methods.getBalance(accounts[0]).send({
+    //       from:accounts[0]
+    //     });
+
+    //     this.setState({balance: balance});
+
+    //   }
+    // });
 
   }
 
@@ -202,7 +241,6 @@ triggerSearch = async (event) => {
                         </List.Content>
                     </List.Item>
 
-                    
 
                     <List.Item>
                         <List.Icon name='caret right' size='small' verticalAlign='middle' />
@@ -249,7 +287,7 @@ triggerSearch = async (event) => {
 
     );
 
-    this.setState({downloadCost:Math.floor((TorrentInfo[Randomindex]['size']*5)/3)});
+    this.setState({downloadCost:Math.floor((TorrentInfo[Randomindex]['size']*5)/3 * 100000000)});
     this.setState({fileName: searchTerm, fileLink:TorrentInfo[Randomindex]['link'],
        fileSize:TorrentInfo[Randomindex]['size'], rating:TorrentInfo[Randomindex]['rating'], userId:accounts[0]});
 
@@ -267,6 +305,12 @@ triggerSearch = async (event) => {
       
                 <Grid>
 
+                <Breadcrumb>
+                  <Breadcrumb.Section link>Balance (in wei)</Breadcrumb.Section>
+                  <Breadcrumb.Divider />
+                  <Breadcrumb.Section active>{this.state.balance}</Breadcrumb.Section>
+                </Breadcrumb>                  
+
                 <GridRow>
                     <GridColumn width={12}>
                         <Form onSubmit = {this.onSubmit}>
@@ -276,7 +320,6 @@ triggerSearch = async (event) => {
                                     value = {this.state.value}
                                     onChange = {this.triggerSearch}
                                 />
-                        
                             </FormField>
                             <List divided relaxed>{this.state.displayResults}</List>
                         </Form>
@@ -284,6 +327,7 @@ triggerSearch = async (event) => {
                 </GridRow>
 
                 <GridRow>
+      
                     <GridColumn>
                         <Card.Group>{this.state.description}</Card.Group>
                     </GridColumn>

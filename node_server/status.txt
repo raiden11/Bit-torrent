@@ -1,0 +1,42 @@
+NAME
+  Id: 1
+  Name: Scikit-learn: Machine Learning in Python.pdf
+  Hash: 5ba4939a00a9b21629a0ad7d376898b768d997a3
+  Magnet: magnet:?xt=urn:btih:5ba4939a00a9b21629a0ad7d376898b768d997a3&dn=Scikit-learn%3A%20Machine%20Learning%20in%20Python.pdf&tr=http%3A%2F%2Facademictorrents.com%2Fannounce.php&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969
+
+TRANSFER
+  State: Stopped
+  Location: /home/ayush/Downloads/
+  Percent Done: 100%
+  ETA: 0 seconds (0 seconds)
+  Download Speed: 0 kB/s
+  Upload Speed: 0 kB/s
+  Have: 42.31 kB (42.31 kB verified)
+  Availability: 100%
+  Total size: 42.31 kB (42.31 kB wanted)
+  Downloaded: 70.27 kB
+  Uploaded: None
+  Ratio: 0.0
+  Corrupt DL: None
+  Error: No data found! Ensure your drives are connected or use "Set Location". To re-download, remove the torrent and re-add it.
+  Peers: connected to 0, uploading to 0, downloading from 0
+
+HISTORY
+  Date added:       Wed May 29 12:34:05 2019
+  Date finished:    Wed May 29 12:34:30 2019
+  Latest activity:  Wed May 29 12:34:30 2019
+  Downloading Time: 25 seconds (25 seconds)
+
+ORIGINS
+  Public torrent: Yes
+  Piece Count: 3
+  Piece Size: 16.00 KiB
+
+LIMITS & BANDWIDTH
+  Download Limit: Unlimited
+  Upload Limit: Unlimited
+  Ratio Limit: Default
+  Honors Session Limits: Yes
+  Peer limit: 50
+  Bandwidth Priority: Normal
+

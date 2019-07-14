@@ -1,13 +1,16 @@
 import React, {Component} from 'react';
 import UserBase from '../Ethereum/Users';
-import {Card, Button, List, Container, Header, Grid, GridRow, GridColumn} from 'semantic-ui-react';
+import {Card, Button, List, Container, Header, Grid, GridRow, GridColumn, Breadcrumb} from 'semantic-ui-react';
 import web3 from '../Ethereum/web3';
 
 class Users extends Component {
 
+    
+
     state = {
         username:'',
-        items:[]
+        items:[],
+        balance:0
     };
 
     async componentDidMount(){
@@ -100,6 +103,9 @@ class Users extends Component {
     }
 
 
+   
+
+
     
     render() {
 
@@ -107,7 +113,11 @@ class Users extends Component {
             <Container style= {{marginTop: '30px'}}>
 
                 <Header size='small'>User Address:   {this.state.username}</Header>
+                <br></br>
                 <Grid>
+                   
+
+
                     <GridRow columns={2}>
                         <GridColumn>
                             Downloads

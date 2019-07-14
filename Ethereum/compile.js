@@ -8,9 +8,7 @@ fs.removeSync(buildPath);
 const BtorrentPath = path.resolve(__dirname, 'Contracts', 'Btorrent.sol');
 
 const source = fs.readFileSync(BtorrentPath, 'utf8');
-
 const output = solc.compile(source, 1).contracts;
-
 fs.ensureDirSync(buildPath);
 
 for (let contract in output){
@@ -21,3 +19,4 @@ for (let contract in output){
         output[contract]
     );
 }
+
